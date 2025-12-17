@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMA ISTER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <nav class="bg-indigo-700 text-white p-4 sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold cursor-pointer hover:text-gray-200" onclick="show('catalog')">
+                <i class="fas fa-store"></i> Mi Catálogo
+            </h1>
+            <div id="weather" class="text-sm bg-indigo-800 px-3 py-1 rounded-full hidden md:block">
+                <i class="fas fa-spinner fa-spin"></i> Cargando clima...
+            </div>
+            <div id="nav-actions">
+                </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 mt-6">
+
+        <div id="auth-view" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+            <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-gray-800">Iniciar Sesión</h2>
+            <form id="auth-form" class="space-y-4">
+                <input type="text" id="name" placeholder="Tu Nombre" class="w-full border p-2 rounded hidden focus:ring-2 focus:ring-indigo-500">
+                <input type="email" id="email" placeholder="Correo Electrónico" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500" required>
+                <input type="password" id="password" placeholder="Contraseña" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500" required>
+                <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition">Entrar</button>
+            </form>
+            <p class="text-center mt-4 text-sm text-gray-600">
+                <span id="auth-switch-text">¿No tienes cuenta?</span>
+                <button onclick="toggleAuth()" class="text-indigo-600 font-bold hover:underline">Clic aquí</button>
+            </p>
+        </div>
+
+        <div id="catalog-view" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Productos Disponibles</h2>
+                <button onclick="show('create')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow">
+                    <i class="fas fa-plus"></i> Nuevo Producto
+                </button>
+            </div>
+            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                </div>
+        </div>
+
+        <div id="create-view" class="hidden max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Subir Producto a Firebase</h2>
+            <form id="create-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+                    <input type="text" id="prod-name" class="w-full border p-2 rounded mt-1" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <textarea id="prod-desc" class="w-full border p-2 rounded mt-1" rows="3" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Precio ($)</label>
+                    <input type="number" step="0.01" id="prod-price" class="w-full border p-2 rounded mt-1" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Imagen (Obligatorio)</label>
+                    <input type="file" id="prod-image" class="w-full border p-2 rounded mt-1" required>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">Guardar Producto</button>
+            </form>
+            <button onclick="show('catalog')" class="w-full mt-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+        </div>
+
+        <div id="favorites-view" class="hidden">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">Mis Favoritos ❤️</h2>
+            <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+            <button onclick="show('catalog')" class="mt-8 text-indigo-600 underline">Volver al catálogo</button>
+        </div>
+
+    </div>
+
+    <script>
+      const API_URL = 'http://127.0.0.1:8000/api'; 
+        let token = localStorage.getItem('token');
+        let isRegister = false;
+
+        // TU CORREO DE ADMINISTRADOR
+        const ADMIN_EMAIL = 'matias2321160@gmail.com';
+
+        // 1. INICIALIZAR
+        async function init() {
+            loadWeather(); 
+            if(token) {
+                updateNav();
+                show('catalog');
+            } else {
+                show('auth');
+            }
+        }
+
+        // 2. CLIMA
+        async function loadWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-0.22&longitude=-78.51&current_weather=true');
+                const data = await res.json();
+                document.getElementById('weather').innerHTML = 
+                    `<i class="fas fa-cloud"></i> Quito: ${data.current_weather.temperature}°C`;
+            } catch(e) { console.error("Error clima", e); }
+        }
+
+        // 3. NAVEGACIÓN
+        function show(viewId) {
+            ['auth-view', 'catalog-view', 'create-view', 'favorites-view'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(viewId + '-view').classList.remove('hidden');
+
+            if(viewId === 'catalog') loadProducts();
+            if(viewId === 'favorites') loadFavorites();
+        }
+
+        function updateNav() {
+            const nav = document.getElementById('nav-actions');
+            if(token) {
+                nav.innerHTML = `
+                    <button onclick="show('favorites')" class="mr-4 hover:text-yellow-300 transition"><i class="fas fa-heart"></i> Favoritos</button>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Salir</button>
+                `;
+            } else { nav.innerHTML = ''; }
+        }
+
+        // 4. AUTH
+        function toggleAuth() {
+            isRegister = !isRegister;
+            document.getElementById('auth-title').innerText = isRegister ? 'Registrarse' : 'Iniciar Sesión';
+            document.getElementById('name').classList.toggle('hidden');
+            document.getElementById('auth-switch-text').innerText = isRegister ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?';
+        }
+
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const endpoint = isRegister ? '/auth/register' : '/auth/login';
+            const body = isRegister ? {name, email, password} : {email, password};
+
+            try {
+                const res = await fetch(API_URL + endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    // Guardamos tu correo para saber si eres admin
+                    localStorage.setItem('user_email', data.user.email);
+                    updateNav();
+                    show('catalog');
+                } else {
+                    alert('Error: ' + (data.message || 'Datos incorrectos'));
+                }
+            } catch(error) { alert('Error de conexión'); }
+        };
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user_email');
+            token = null;
+            location.reload();
+        }
+
+        // 5. PRODUCTOS (Aquí está la magia de ocultar botones)
+        async function loadProducts() {
+            const res = await fetch(API_URL + '/products');
+            const products = await res.json();
+            const grid = document.getElementById('products-grid');
+            
+            // Verificamos si eres TÚ
+            const myEmail = localStorage.getItem('user_email');
+            const isAdmin = (myEmail === ADMIN_EMAIL);
+
+            // Mostrar/Ocultar botón de Crear
+            const createBtn = document.querySelector('button[onclick="show(\'create\')"]');
+            if(createBtn) createBtn.style.display = isAdmin ? 'block' : 'none';
+            
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                    <img src="${p.image_url}" class="w-full h-48 object-cover">
+                    <div class="p-4 flex-grow">
+                        <h3 class="font-bold text-xl mb-2">${p.name}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${p.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold text-lg">$${p.price}</span>
+                            <div class="space-x-2">
+                                <button onclick="addFav(${p.id})" class="text-gray-400 hover:text-red-500 transition" title="Favorito"><i class="fas fa-heart fa-lg"></i></button>
+                                
+                                ${isAdmin ? `<button onclick="deleteProduct(${p.id})" class="text-gray-400 hover:text-red-700 transition" title="Eliminar"><i class="fas fa-trash"></i></button>` : ''}
+                            
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <button onclick="toggleComments(${p.id})" class="text-indigo-500 text-sm hover:underline">Ver comentarios</button>
+                            <div id="comments-section-${p.id}" class="hidden mt-2">
+                                <div id="comments-list-${p.id}" class="bg-gray-50 p-2 rounded text-xs mb-2 max-h-24 overflow-y-auto"></div>
+                                <div class="flex">
+                                    <input type="text" id="comment-input-${p.id}" placeholder="Escribe algo..." class="border rounded-l w-full p-1 text-sm">
+                                    <button onclick="postComment(${p.id})" class="bg-indigo-500 text-white px-2 rounded-r text-sm">Enviar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 6. CREAR (Firebase)
+        document.getElementById('create-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = "Subiendo...";
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('prod-name').value);
+            formData.append('description', document.getElementById('prod-desc').value);
+            formData.append('price', document.getElementById('prod-price').value);
+            formData.append('image', document.getElementById('prod-image').files[0]);
+
+            const res = await fetch(API_URL + '/products', {
+                method: 'POST',
+                headers: {'Authorization': `Bearer ${token}`},
+                body: formData
+            });
+
+            if(res.ok) {
+                alert('¡Producto Creado!');
+                show('catalog');
+                e.target.reset();
+            } else {
+                const err = await res.json();
+                alert(err.message || 'Error al subir');
+            }
+            btn.innerText = "Guardar Producto";
+            btn.disabled = false;
+        };
+
+        async function deleteProduct(id) {
+            if(!confirm('¿Borrar producto?')) return;
+            await fetch(`${API_URL}/products/${id}`, {
+                method: 'DELETE',
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+            loadProducts();
+        }
+
+        // 7. FAVORITOS Y COMENTARIOS
+        async function addFav(id) {
+            await fetch(API_URL + '/favorites', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify({product_id: id})
+            });
+            alert('Añadido a favoritos ❤️');
+        }
+
+        async function loadFavorites() {
+            const res = await fetch(API_URL + '/favorites', { headers: {'Authorization': `Bearer ${token}`} });
+            const favs = await res.json();
+            document.getElementById('favorites-grid').innerHTML = favs.length ? favs.map(p => `
+                <div class="bg-white rounded shadow p-4">
+                    <img src="${p.image_url}" class="w-full h-32 object-cover rounded mb-2">
+                    <h3 class="font-bold">${p.name}</h3>
+                    <button onclick="removeFav(${p.id})" class="text-red-500 text-sm mt-2 hover:underline">Quitar de favoritos</button>
+                </div>
+            `).join('') : '<p class="text-gray-500 col-span-3 text-center">No tienes favoritos aún.</p>';
+        }
+
+        async function removeFav(id) {
+            await fetch(`${API_URL}/favorites/${id}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${token}`} });
+            loadFavorites();
+        }
+
+        async function toggleComments(id) {
+            const section = document.getElementById(`comments-section-${id}`);
+            section.classList.toggle('hidden');
+            if(!section.classList.contains('hidden')) {
+                const res = await fetch(`${API_URL}/comments/${id}`);
+                const comments = await res.json();
+                const list = document.getElementById(`comments-list-${id}`);
+                list.innerHTML = comments.length ? comments.map(c => `<p class="mb-1"><strong>${c.user}:</strong> ${c.content}</p>`).join('') : '<p class="text-gray-400 italic">Sé el primero en comentar</p>';
+            }
+        }
+
+        async function postComment(id) {
+            const input = document.getElementById(`comment-input-${id}`);
+            const content = input.value;
+            if(!content) return;
+            await fetch(API_URL + '/comments', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
+                body: JSON.stringify({product_id: id, content})
+            });
+            input.value = '';
+            toggleComments(id);
+            document.getElementById(`comments-section-${id}`).classList.add('hidden');
+            toggleComments(id);
+        }
+
+        init();
+    </script>
+</body>
+</html>
