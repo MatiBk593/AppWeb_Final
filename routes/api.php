@@ -5,30 +5,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 
-// --- RUTAS PÚBLICAS ---
-// Autenticación [cite: 153]
+// Auth
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-// Catálogo Público [cite: 157]
+// Rutas Públicas
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
-Route::get('/comments/{product_id}', [ProductController::class, 'getComments']); // Ver comentarios
+Route::get('/comments/{id}', [ProductController::class, 'getComments']);
 
-// --- RUTAS PROTEGIDAS (Necesitan Login) ---
+// Rutas Protegidas (Necesitan Token)
 Route::middleware('auth:sanctum')->group(function () {
-    // Cerrar sesión [cite: 156]
     Route::post('/auth/logout', [AuthController::class, 'logout']);
-
-    // Gestión de Productos (Admin) [cite: 160, 162]
-    Route::post('/products', [ProductController::class, 'store']); // Crear con imagen Firebase
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']); // Eliminar
-
-    // Favoritos [cite: 165]
+    
+    // Productos (Crear, Editar, Borrar)
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::post('/products/{id}', [ProductController::class, 'update']); 
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    
+    // Favoritos y Comentarios
     Route::post('/favorites', [ProductController::class, 'addFavorite']);
     Route::get('/favorites', [ProductController::class, 'getFavorites']);
-    Route::delete('/favorites/{product_id}', [ProductController::class, 'removeFavorite']);
-
-    // Comentarios [cite: 169]
+    Route::delete('/favorites/{id}', [ProductController::class, 'removeFavorite']);
     Route::post('/comments', [ProductController::class, 'addComment']);
 });

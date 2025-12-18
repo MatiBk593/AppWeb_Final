@@ -3,120 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MMA ISTER</title>
+    <title>Catálogo MMA ISTER</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .animate-fade-in-down { animation: fadeInDown 0.5s ease-out; }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translate3d(0, -20px, 0); }
+            to { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        
+        
+        .category-btn.active { 
+            background-color: #dc2626; 
+            color: white; 
+            border-color: #dc2626; 
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); 
+        }
+        
+      
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-black to-black font-sans antialiased text-neutral-200 flex flex-col min-h-screen">
 
-    <nav class="bg-indigo-700 text-white p-4 sticky top-0 z-50 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold cursor-pointer hover:text-gray-200" onclick="show('catalog')">
-                <i class="fas fa-store"></i> Mi Catálogo
-            </h1>
-            <div id="weather" class="text-sm bg-indigo-800 px-3 py-1 rounded-full hidden md:block">
-                <i class="fas fa-spinner fa-spin"></i> Cargando clima...
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-3"></div>
+
+    <nav class="bg-black/90 text-white shadow-2xl sticky top-0 z-50 backdrop-blur-md border-b border-neutral-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <img src="logo.png" alt="MMA STORE" class="h-24 w-auto cursor-pointer hover:scale-105 transition-transform duration-300 filter drop-shadow-[0_0_8px_rgba(37,99,235,0.6)]" onclick="show('catalog')">
+
+            <div class="flex items-center space-x-4">
+                <div id="weather" class="text-lg font-bold text-neutral-200 hidden md:block mr-6 font-mono tracking-wide"></div>
+                <div id="nav-actions" class="flex items-center font-medium text-sm"></div>
             </div>
-            <div id="nav-actions">
-                </div>
         </div>
     </nav>
 
-    <div class="container mx-auto p-4 mt-6">
+    <main class="container mx-auto p-6 flex-grow">
 
-        <div id="auth-view" class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-gray-800">Iniciar Sesión</h2>
-            <form id="auth-form" class="space-y-4">
-                <input type="text" id="name" placeholder="Tu Nombre" class="w-full border p-2 rounded hidden focus:ring-2 focus:ring-indigo-500">
-                <input type="email" id="email" placeholder="Correo Electrónico" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500" required>
-                <input type="password" id="password" placeholder="Contraseña" class="w-full border p-2 rounded focus:ring-2 focus:ring-indigo-500" required>
-                <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700 transition">Entrar</button>
-            </form>
-            <p class="text-center mt-4 text-sm text-gray-600">
-                <span id="auth-switch-text">¿No tienes cuenta?</span>
-                <button onclick="toggleAuth()" class="text-indigo-600 font-bold hover:underline">Clic aquí</button>
-            </p>
+        <div id="auth-view" class="max-w-md mx-auto bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden mt-10 border border-neutral-800 hidden">
+            <div class="bg-black p-6 text-center border-b border-neutral-800">
+                <h2 id="auth-title" class="text-2xl font-bold text-white tracking-widest uppercase">Iniciar Sesión</h2>
+                <p class="text-neutral-500 text-sm mt-1">Bienvenido Campeón</p>
+            </div>
+            <div class="p-8">
+                <form id="auth-form" class="space-y-4">
+                    <input type="text" id="name" placeholder="Tu Nombre" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 hidden placeholder-neutral-500">
+                    <input type="email" id="email" placeholder="Correo" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 placeholder-neutral-500" required>
+                    <input type="password" id="password" placeholder="Contraseña" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 placeholder-neutral-500" required>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-red-900/40 transition">ENTRAR</button>
+                </form>
+                <div class="mt-6 text-center border-t border-neutral-800 pt-4">
+                    <button onclick="toggleAuth()" class="text-sm text-blue-500 hover:text-blue-400 hover:underline" id="auth-switch-text">¿No tienes cuenta? Regístrate</button>
+                </div>
+            </div>
         </div>
 
-        <div id="catalog-view" class="hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-gray-800">Productos Disponibles</h2>
-                <button onclick="show('create')" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 shadow">
-                    <i class="fas fa-plus"></i> Nuevo Producto
+        <div id="catalog-view" class="hidden animate-fade-in-down">
+            <div class="flex flex-wrap gap-2 mb-8 justify-center md:justify-start">
+                <button onclick="filterProducts('TODO')" id="btn-TODO" class="category-btn active px-4 py-2 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-300 font-bold text-sm hover:bg-neutral-700 transition"> TODO</button>
+                <button onclick="filterProducts('GUANTES')" id="btn-GUANTES" class="category-btn px-4 py-2 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-300 font-bold text-sm hover:bg-neutral-700 transition"> GUANTES</button>
+                <button onclick="filterProducts('BUCALES')" id="btn-BUCALES" class="category-btn px-4 py-2 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-300 font-bold text-sm hover:bg-neutral-700 transition"> BUCALES</button>
+                <button onclick="filterProducts('ESPINILLERAS')" id="btn-ESPINILLERAS" class="category-btn px-4 py-2 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-300 font-bold text-sm hover:bg-neutral-700 transition"> ESPINILLERAS</button>
+                <button onclick="filterProducts('ENTRENAMIENTO')" id="btn-ENTRENAMIENTO" class="category-btn px-4 py-2 rounded-full border border-neutral-700 bg-neutral-800 text-neutral-300 font-bold text-sm hover:bg-neutral-700 transition"> ENTRENAMIENTO</button>
+            </div>
+
+            <div class="flex justify-between items-center mb-6 border-b border-neutral-800 pb-4">
+                <h2 class="text-3xl font-bold text-white uppercase tracking-tight" id="cat-title">Productos Destacados</h2>
+                <button onclick="show('create')" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-full shadow-lg shadow-red-900/50 transition transform hover:scale-105 hidden create-btn font-bold">
+                    <i class="fas fa-plus mr-2"></i> Nuevo
                 </button>
             </div>
-            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                </div>
+            
+            <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
         </div>
 
-        <div id="create-view" class="hidden max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Subir Producto a Firebase</h2>
-            <form id="create-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
-                    <input type="text" id="prod-name" class="w-full border p-2 rounded mt-1" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Descripción</label>
-                    <textarea id="prod-desc" class="w-full border p-2 rounded mt-1" rows="3" required></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Precio ($)</label>
-                    <input type="number" step="0.01" id="prod-price" class="w-full border p-2 rounded mt-1" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Imagen (Obligatorio)</label>
-                    <input type="file" id="prod-image" class="w-full border p-2 rounded mt-1" required>
-                </div>
-                <button type="submit" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700">Guardar Producto</button>
-            </form>
-            <button onclick="show('catalog')" class="w-full mt-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+        <div id="create-view" class="max-w-2xl mx-auto bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden mt-6 hidden animate-fade-in-down border border-neutral-800">
+            <div class="bg-black p-6 flex justify-between items-center border-b border-neutral-800">
+                <h2 class="text-xl font-bold text-white uppercase">Subir Nuevo Artículo</h2>
+                <button onclick="show('catalog')" class="text-neutral-400 hover:text-white transition"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+            <div class="p-8">
+                <form id="create-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Categoría</label>
+                        <select id="prod-category" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-red-600" required>
+                            <option value="GUANTES">Guantes</option>
+                            <option value="BUCALES">Bucales</option>
+                            <option value="ESPINILLERAS">Espinilleras</option>
+                            <option value="ENTRENAMIENTO">Implementos de Entrenamiento</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Nombre</label><input type="text" id="prod-name" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-red-600" required></div>
+                    <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Descripción</label><textarea id="prod-desc" rows="3" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-red-600"></textarea></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Precio ($)</label><input type="number" step="0.01" id="prod-price" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-red-600" required></div>
+                        <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Foto</label><input type="file" id="prod-image" accept="image/*" class="w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-white hover:file:bg-neutral-600" required></div>
+                    </div>
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-red-900/40">Guardar</button>
+                </form>
+            </div>
         </div>
 
-        <div id="favorites-view" class="hidden">
-            <h2 class="text-3xl font-bold mb-6 text-gray-800">Mis Favoritos ❤️</h2>
-            <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
-            <button onclick="show('catalog')" class="mt-8 text-indigo-600 underline">Volver al catálogo</button>
+        <div id="edit-view" class="max-w-2xl mx-auto bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden mt-6 hidden animate-fade-in-down border border-neutral-800">
+            <div class="bg-blue-900/20 p-6 flex justify-between items-center border-b border-blue-900/30">
+                <h2 class="text-xl font-bold text-blue-400 uppercase">Editar Producto</h2>
+                <button onclick="show('catalog')" class="text-neutral-400 hover:text-white"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+            <div class="p-8">
+                <form id="edit-form" class="space-y-6">
+                    <input type="hidden" id="edit-id">
+                    <div>
+                        <label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Categoría</label>
+                        <select id="edit-category" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            <option value="GUANTES">Guantes</option>
+                            <option value="BUCALES">Bucales</option>
+                            <option value="ESPINILLERAS">Espinilleras</option>
+                            <option value="ENTRENAMIENTO">Implementos de Entrenamiento</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Nombre</label><input type="text" id="edit-name" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500" required></div>
+                    <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Descripción</label><textarea id="edit-desc" rows="3" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Precio ($)</label><input type="number" step="0.01" id="edit-price" class="w-full bg-neutral-800 border border-neutral-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500" required></div>
+                        <div><label class="block text-sm font-bold text-neutral-400 mb-1 uppercase">Cambiar Foto (Opcional)</label><input type="file" id="edit-image" accept="image/*" class="w-full text-sm text-neutral-500 file:bg-neutral-700 file:text-white"></div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-900/40">Guardar Cambios</button>
+                </form>
+            </div>
         </div>
 
-    </div>
+        <div id="favorites-view" class="hidden animate-fade-in-down">
+            <div class="flex justify-between items-center mb-6 border-b border-neutral-800 pb-4">
+                <h2 class="text-2xl font-bold text-red-500 uppercase tracking-widest"><i class="fas fa-heart mr-2"></i>Mis Favoritos</h2>
+                <button onclick="show('catalog')" class="text-neutral-400 hover:text-white underline">Volver</button>
+            </div>
+            <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+        </div>
+    </main>
+
+    <footer class="bg-black text-neutral-500 text-center py-8 mt-12 text-sm border-t border-neutral-900">
+        <p>Desarrollado por <span class="text-white font-bold tracking-wider">Matías Alvarado</span> | MMA ISTER</p>
+        <p class="text-xs mt-2 opacity-40">&copy; 2025 Proyecto Final</p>
+    </footer>
 
     <script>
-      const API_URL = 'http://127.0.0.1:8000/api'; 
+        const API_URL = 'http://127.0.0.1:8000/api'; 
         let token = localStorage.getItem('token');
         let isRegister = false;
-
-        // TU CORREO DE ADMINISTRADOR
+        let allProducts = [];
         const ADMIN_EMAIL = 'matias2321160@gmail.com';
 
-        // 1. INICIALIZAR
-        async function init() {
-            loadWeather(); 
-            if(token) {
-                updateNav();
-                show('catalog');
-            } else {
-                show('auth');
+       
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            
+            let borderClass = 'border-green-500';
+            let icon = '<i class="fas fa-check-circle text-green-400"></i>';
+            
+            if(type === 'error') {
+                borderClass = 'border-red-600';
+                icon = '<i class="fas fa-exclamation-triangle text-red-500"></i>';
+            } else if(type === 'info') {
+                borderClass = 'border-blue-500';
+                icon = '<i class="fas fa-info-circle text-blue-400"></i>';
             }
+
+            toast.className = `toast-enter max-w-sm w-full bg-neutral-800 shadow-2xl rounded-r-lg pointer-events-auto flex ring-1 ring-black ring-opacity-50 overflow-hidden`;
+            toast.innerHTML = `
+                <div class="p-4 flex items-center w-full ${borderClass} border-l-4">
+                    <div class="flex-shrink-0 text-xl mr-3">${icon}</div>
+                    <div class="flex-1 w-0 truncate font-medium text-sm text-neutral-200">${message}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
         }
 
-        // 2. CLIMA
+        async function init() {
+            loadWeather(); 
+            if(token) { updateNav(); show('catalog'); } else { show('auth'); }
+        }
+
         async function loadWeather() {
             try {
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-0.22&longitude=-78.51&current_weather=true');
                 const data = await res.json();
-                document.getElementById('weather').innerHTML = 
-                    `<i class="fas fa-cloud"></i> Quito: ${data.current_weather.temperature}°C`;
-            } catch(e) { console.error("Error clima", e); }
+                const temp = data.current_weather.temperature;
+                let frase = "¡Sin excusas!";
+                if(temp < 10) frase = "¡Ponte abrigo! 🥶";
+                else if(temp > 22) frase = "¡Hidrátate bien! 🥵";
+                else frase = "¡Clima de pelea! 🥊";
+                document.getElementById('weather').innerHTML = `<span class="font-bold text-red-500 mr-2 italic">"${frase}"</span> Quito: <span class="text-white">${temp}°C</span>`;
+            } catch(e) {}
         }
 
-        // 3. NAVEGACIÓN
         function show(viewId) {
-            ['auth-view', 'catalog-view', 'create-view', 'favorites-view'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
+            ['auth-view', 'catalog-view', 'create-view', 'favorites-view', 'edit-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(viewId + '-view').classList.remove('hidden');
-
             if(viewId === 'catalog') loadProducts();
             if(viewId === 'favorites') loadFavorites();
         }
@@ -125,93 +222,65 @@
             const nav = document.getElementById('nav-actions');
             if(token) {
                 nav.innerHTML = `
-                    <button onclick="show('favorites')" class="mr-4 hover:text-yellow-300 transition"><i class="fas fa-heart"></i> Favoritos</button>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-sm transition">Salir</button>
+                    <button onclick="show('favorites')" class="mr-6 text-neutral-400 hover:text-red-500 transition-colors"><i class="fas fa-heart fa-lg"></i></button>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-sm transition font-bold shadow-md shadow-red-900/40">Cerrar Sesion</button>
                 `;
             } else { nav.innerHTML = ''; }
         }
 
-        // 4. AUTH
-        function toggleAuth() {
-            isRegister = !isRegister;
-            document.getElementById('auth-title').innerText = isRegister ? 'Registrarse' : 'Iniciar Sesión';
-            document.getElementById('name').classList.toggle('hidden');
-            document.getElementById('auth-switch-text').innerText = isRegister ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?';
+        function filterProducts(category) {
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + category).classList.add('active');
+            let filtered = (category === 'TODO') ? allProducts : allProducts.filter(p => p.category === category);
+            document.getElementById('cat-title').innerText = (category === 'TODO') ? "Lo Más Popular " : category;
+            renderGrid(filtered);
         }
 
-        document.getElementById('auth-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const endpoint = isRegister ? '/auth/register' : '/auth/login';
-            const body = isRegister ? {name, email, password} : {email, password};
-
-            try {
-                const res = await fetch(API_URL + endpoint, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-
-                if(res.ok) {
-                    token = data.token;
-                    localStorage.setItem('token', token);
-                    // Guardamos tu correo para saber si eres admin
-                    localStorage.setItem('user_email', data.user.email);
-                    updateNav();
-                    show('catalog');
-                } else {
-                    alert('Error: ' + (data.message || 'Datos incorrectos'));
-                }
-            } catch(error) { alert('Error de conexión'); }
-        };
-
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user_email');
-            token = null;
-            location.reload();
-        }
-
-        // 5. PRODUCTOS (Aquí está la magia de ocultar botones)
-        async function loadProducts() {
-            const res = await fetch(API_URL + '/products');
-            const products = await res.json();
+        function renderGrid(products) {
             const grid = document.getElementById('products-grid');
-            
-            // Verificamos si eres TÚ
             const myEmail = localStorage.getItem('user_email');
             const isAdmin = (myEmail === ADMIN_EMAIL);
-
-            // Mostrar/Ocultar botón de Crear
-            const createBtn = document.querySelector('button[onclick="show(\'create\')"]');
+            const createBtn = document.querySelector('.create-btn');
             if(createBtn) createBtn.style.display = isAdmin ? 'block' : 'none';
-            
+
+            if(products.length === 0) {
+                grid.innerHTML = '<p class="text-center col-span-3 text-neutral-600 italic mt-10">No hay productos en esta categoría aún.</p>';
+                return;
+            }
+
             grid.innerHTML = products.map(p => `
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-                    <img src="${p.image_url}" class="w-full h-48 object-cover">
-                    <div class="p-4 flex-grow">
-                        <h3 class="font-bold text-xl mb-2">${p.name}</h3>
-                        <p class="text-gray-600 text-sm mb-4">${p.description}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-green-600 font-bold text-lg">$${p.price}</span>
-                            <div class="space-x-2">
-                                <button onclick="addFav(${p.id})" class="text-gray-400 hover:text-red-500 transition" title="Favorito"><i class="fas fa-heart fa-lg"></i></button>
-                                
-                                ${isAdmin ? `<button onclick="deleteProduct(${p.id})" class="text-gray-400 hover:text-red-700 transition" title="Eliminar"><i class="fas fa-trash"></i></button>` : ''}
-                            
-                            </div>
+                <div class="bg-neutral-900 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-800 group flex flex-col overflow-hidden hover:border-neutral-700">
+                    <div class="relative h-60 overflow-hidden p-4 bg-neutral-800/50">
+                        <img src="${p.image_url}" class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-xl">
+                        <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                             <span class="bg-black/80 text-neutral-300 text-[10px] font-bold px-2 py-1 rounded border border-neutral-700 tracking-wider">${p.category || 'GENERAL'}</span>
+                             ${(p.comments_count + p.favorites_count) > 0 ? `<span class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-1 rounded shadow">🔥 Popular</span>` : ''}
                         </div>
-                        <div class="mt-4 pt-4 border-t border-gray-100">
-                            <button onclick="toggleComments(${p.id})" class="text-indigo-500 text-sm hover:underline">Ver comentarios</button>
-                            <div id="comments-section-${p.id}" class="hidden mt-2">
-                                <div id="comments-list-${p.id}" class="bg-gray-50 p-2 rounded text-xs mb-2 max-h-24 overflow-y-auto"></div>
-                                <div class="flex">
-                                    <input type="text" id="comment-input-${p.id}" placeholder="Escribe algo..." class="border rounded-l w-full p-1 text-sm">
-                                    <button onclick="postComment(${p.id})" class="bg-indigo-500 text-white px-2 rounded-r text-sm">Enviar</button>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-xl mb-1 text-white leading-tight uppercase">${p.name}</h3>
+                            <p class="text-neutral-500 text-sm mb-4 line-clamp-2">${p.description}</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-end mb-4 border-t border-neutral-800 pt-4">
+                                <span class="text-2xl font-extrabold text-blue-500 tracking-tight">$${p.price}</span>
+                                <div class="flex space-x-3 items-center">
+                                    <button onclick="addFav(${p.id})" class="text-neutral-600 hover:text-red-500 transform hover:scale-110 transition-colors"><i class="fas fa-heart fa-lg"></i></button>
+                                    ${isAdmin ? `
+                                        <button onclick="startEdit(${p.id})" class="text-neutral-600 hover:text-blue-500 transform hover:scale-110 mx-1 transition-colors"><i class="fas fa-edit fa-lg"></i></button>
+                                        <button onclick="deleteProduct(${p.id})" class="text-neutral-600 hover:text-red-600 transform hover:scale-110 transition-colors"><i class="fas fa-trash-alt fa-lg"></i></button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <button onclick="toggleComments(${p.id})" class="w-full text-center text-xs font-bold text-neutral-400 bg-neutral-800 py-2 rounded hover:bg-neutral-700 hover:text-white transition uppercase tracking-wide">
+                                <i class="far fa-comment-dots mr-1"></i> Comentarios (${p.comments_count || 0})
+                            </button>
+                            <div id="comments-section-${p.id}" class="hidden mt-3 animate-fade-in-down">
+                                <div id="comments-list-${p.id}" class="bg-black/30 p-3 rounded-lg text-xs mb-2 max-h-32 overflow-y-auto border border-neutral-800"></div>
+                                <div class="flex relative">
+                                    <input type="text" id="comment-input-${p.id}" placeholder="..." class="w-full bg-neutral-800 rounded-full py-2 pl-3 pr-10 text-xs text-white focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-neutral-600">
+                                    <button onclick="postComment(${p.id})" class="absolute right-1 top-1 bg-blue-600 text-white rounded-full w-7 h-7 flex justify-center items-center hover:bg-blue-500"><i class="fas fa-paper-plane text-[10px]"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -220,97 +289,123 @@
             `).join('');
         }
 
-        // 6. CREAR (Firebase)
+        async function loadProducts() {
+            const res = await fetch(API_URL + '/products');
+            allProducts = await res.json();
+            filterProducts('TODO');
+        }
+
+        // AUTH
+        function toggleAuth() {
+            isRegister = !isRegister;
+            document.getElementById('auth-title').innerText = isRegister ? 'Crear Cuenta' : 'Iniciar Sesión';
+            document.getElementById('name').classList.toggle('hidden');
+            document.getElementById('auth-switch-text').innerText = isRegister ? '¿Cuenta existente? Entrar' : '¿Sin cuenta? Registro';
+        }
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value, email = document.getElementById('email').value, password = document.getElementById('password').value;
+            const endpoint = isRegister ? '/auth/register' : '/auth/login';
+            try {
+                const res = await fetch(API_URL + endpoint, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(isRegister ? {name, email, password} : {email, password})});
+                const data = await res.json();
+                if(res.ok) { token = data.token; localStorage.setItem('token', token); localStorage.setItem('user_email', data.user.email); updateNav(); show('catalog'); showToast('¡Bienvenido! 👊'); } 
+                else showToast(data.message, 'error');
+            } catch(e) { showToast('Error de conexión', 'error'); }
+        };
+        function logout() { localStorage.clear(); token = null; location.reload(); }
+
+        // CREAR
         document.getElementById('create-form').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerText = "Subiendo...";
-            btn.disabled = true;
-
+            const btn = e.target.querySelector('button'); btn.innerText = "..."; btn.disabled = true;
             const formData = new FormData();
             formData.append('name', document.getElementById('prod-name').value);
             formData.append('description', document.getElementById('prod-desc').value);
             formData.append('price', document.getElementById('prod-price').value);
+            formData.append('category', document.getElementById('prod-category').value);
             formData.append('image', document.getElementById('prod-image').files[0]);
-
-            const res = await fetch(API_URL + '/products', {
-                method: 'POST',
-                headers: {'Authorization': `Bearer ${token}`},
-                body: formData
-            });
-
-            if(res.ok) {
-                alert('¡Producto Creado!');
-                show('catalog');
-                e.target.reset();
-            } else {
-                const err = await res.json();
-                alert(err.message || 'Error al subir');
-            }
-            btn.innerText = "Guardar Producto";
-            btn.disabled = false;
+            try {
+                const res = await fetch(API_URL + '/products', { method: 'POST', headers: {'Authorization': `Bearer ${token}`}, body: formData });
+                if(res.ok) { showToast('¡Producto Creado! 🚀'); show('catalog'); e.target.reset(); } else { const err = await res.json(); showToast(err.message, 'error'); }
+            } catch(e) { showToast('Error al subir', 'error'); }
+            btn.innerText = "Guardar"; btn.disabled = false;
         };
 
-        async function deleteProduct(id) {
-            if(!confirm('¿Borrar producto?')) return;
-            await fetch(`${API_URL}/products/${id}`, {
-                method: 'DELETE',
-                headers: {'Authorization': `Bearer ${token}`}
-            });
-            loadProducts();
+        // EDITAR 
+        function startEdit(id) {
+            const p = allProducts.find(prod => prod.id === id);
+            if(!p) return;
+            document.getElementById('edit-id').value = p.id;
+            document.getElementById('edit-name').value = p.name;
+            document.getElementById('edit-desc').value = p.description;
+            document.getElementById('edit-price').value = p.price;
+            document.getElementById('edit-category').value = p.category;
+            document.getElementById('edit-image').value = ""; // Reset
+            
+            ['auth-view', 'catalog-view', 'create-view', 'favorites-view', 'edit-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('edit-view').classList.remove('hidden');
         }
 
-        // 7. FAVORITOS Y COMENTARIOS
-        async function addFav(id) {
-            await fetch(API_URL + '/favorites', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-                body: JSON.stringify({product_id: id})
-            });
-            alert('Añadido a favoritos ❤️');
-        }
+        document.getElementById('edit-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const btn = e.target.querySelector('button'); btn.innerText = "Guardando..."; btn.disabled = true;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('edit-name').value);
+            formData.append('description', document.getElementById('edit-desc').value);
+            formData.append('price', document.getElementById('edit-price').value);
+            formData.append('category', document.getElementById('edit-category').value);
+            const imgInput = document.getElementById('edit-image');
+            if(imgInput.files[0]) formData.append('image', imgInput.files[0]);
+            
+            try {
+                const res = await fetch(`${API_URL}/products/${id}`, { method: 'POST', headers: {'Authorization': `Bearer ${token}`}, body: formData });
+                if(res.ok) { showToast('¡Producto Actualizado! ✨', 'info'); show('catalog'); } else { const err = await res.json(); showToast('Error: ' + err.message, 'error'); }
+            } catch(error) { showToast('Error al conectar', 'error'); }
+            btn.innerText = "Guardar Cambios"; btn.disabled = false;
+        };
 
+        async function deleteProduct(id) { 
+            if(confirm('¿Seguro que quieres borrar este ítem?')) { 
+                await fetch(`${API_URL}/products/${id}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${token}`} }); 
+                showToast('Producto eliminado 🗑️', 'error');
+                loadProducts(); 
+            } 
+        }
+        async function addFav(id) { 
+            await fetch(API_URL + '/favorites', { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`}, body: JSON.stringify({product_id: id})}); 
+            showToast('Añadido a Favoritos ❤️'); 
+            loadProducts(); 
+        }
         async function loadFavorites() {
             const res = await fetch(API_URL + '/favorites', { headers: {'Authorization': `Bearer ${token}`} });
             const favs = await res.json();
             document.getElementById('favorites-grid').innerHTML = favs.length ? favs.map(p => `
-                <div class="bg-white rounded shadow p-4">
-                    <img src="${p.image_url}" class="w-full h-32 object-cover rounded mb-2">
-                    <h3 class="font-bold">${p.name}</h3>
-                    <button onclick="removeFav(${p.id})" class="text-red-500 text-sm mt-2 hover:underline">Quitar de favoritos</button>
+                <div class="bg-neutral-900 rounded p-4 shadow border border-neutral-800">
+                    <img src="${p.image_url}" class="w-full h-32 object-contain mb-2">
+                    <h3 class="font-bold text-white">${p.name}</h3>
+                    <button onclick="removeFav(${p.id})" class="text-red-500 text-sm hover:underline">Quitar</button>
                 </div>
-            `).join('') : '<p class="text-gray-500 col-span-3 text-center">No tienes favoritos aún.</p>';
+            `).join('') : '<p class="text-center col-span-3 text-neutral-600">Aún no tienes favoritos.</p>';
         }
-
-        async function removeFav(id) {
-            await fetch(`${API_URL}/favorites/${id}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${token}`} });
-            loadFavorites();
+        async function removeFav(id) { 
+            await fetch(`${API_URL}/favorites/${id}`, { method: 'DELETE', headers: {'Authorization': `Bearer ${token}`} }); 
+            showToast('Eliminado de favoritos 💔', 'error');
+            loadFavorites(); 
         }
-
         async function toggleComments(id) {
-            const section = document.getElementById(`comments-section-${id}`);
-            section.classList.toggle('hidden');
+            const section = document.getElementById(`comments-section-${id}`); section.classList.toggle('hidden');
             if(!section.classList.contains('hidden')) {
-                const res = await fetch(`${API_URL}/comments/${id}`);
-                const comments = await res.json();
-                const list = document.getElementById(`comments-list-${id}`);
-                list.innerHTML = comments.length ? comments.map(c => `<p class="mb-1"><strong>${c.user}:</strong> ${c.content}</p>`).join('') : '<p class="text-gray-400 italic">Sé el primero en comentar</p>';
+                const res = await fetch(`${API_URL}/comments/${id}`); const comments = await res.json();
+                document.getElementById(`comments-list-${id}`).innerHTML = comments.length ? comments.map(c => `<p class="border-b border-neutral-700 pb-1 mb-1 text-neutral-300"><strong class="text-blue-400">${c.user}:</strong> ${c.content}</p>`).join('') : '<p class="italic text-neutral-600">Sin comentarios</p>';
             }
         }
-
         async function postComment(id) {
-            const input = document.getElementById(`comment-input-${id}`);
-            const content = input.value;
-            if(!content) return;
-            await fetch(API_URL + '/comments', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
-                body: JSON.stringify({product_id: id, content})
-            });
-            input.value = '';
-            toggleComments(id);
-            document.getElementById(`comments-section-${id}`).classList.add('hidden');
-            toggleComments(id);
+            const input = document.getElementById(`comment-input-${id}`); if(!input.value) return;
+            await fetch(API_URL + '/comments', { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`}, body: JSON.stringify({product_id: id, content: input.value})});
+            input.value = ''; toggleComments(id); document.getElementById(`comments-section-${id}`).classList.add('hidden'); toggleComments(id); loadProducts();
+            showToast('Comentario enviado 💬');
         }
 
         init();
