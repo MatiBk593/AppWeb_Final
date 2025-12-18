@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $user->createToken('api')->plainTextToken,
-            'user' => $user // Enviamos tus datos para saber que eres tú
+            'user' => $user 
         ]);
     }
 
